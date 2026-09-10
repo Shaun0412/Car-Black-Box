@@ -25,17 +25,22 @@
 #define BACK_BUTTON 0x3E
 
 
-
+//scrolling menu
 #define SELECT_LINE1  0
 #define SELECT_LINE2  1
 
-
+//menu-option selection
 #define VIEW_LOG 0
 #define CLEAR_LOG 1
 #define DOWNLOAD_LOG 2
 #define SET_TIME 3
 #define CHANGE_PASSWORD 4
 
+//set_time
+#define SECOND_FIELD 0
+#define MINUTE_FIELD 1
+#define HOUR_FIELD 2
+#define BLINK_DELAY 1000
 typedef struct 
 {
     unsigned char hour[3];
@@ -48,7 +53,9 @@ void menu_handling();
 void menu_selection(unsigned char selection_option);
 void view_log();
 void read_log(event_t *events,unsigned char event_index);
+
 void print_log_event(event_t *event,int line);
+void set_time();
 unsigned char validate_password();
 void clear_log();
 #endif	/* MENU_H */

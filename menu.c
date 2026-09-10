@@ -1,4 +1,4 @@
-#include <xc.h>
+//#include <xc.h>
 #include "keypad.h"
 #include "clcd.h"
 #include "adc.h"
@@ -13,6 +13,8 @@
 extern volatile unsigned char one_second_flag;
 
 extern unsigned char event_count;
+
+unsigned char time_changed_flag = 0;
 
 //RB4->0,RB5->1
 
@@ -160,6 +162,15 @@ void menu_handling()
                 
             }
             menu_selection(selected_option_index);
+            if(selected_option_index == SET_TIME)
+            {
+                
+                if(time_changed_flag == 1)
+                {
+                    dashboard_screen_setup();
+                    return;
+                }
+            }
             change = 1;
             continue;
         }
@@ -195,6 +206,7 @@ void menu_selection(unsigned char selection_option)
         }
         case SET_TIME:
         {
+            set_time();
             break;
         }
         case CHANGE_PASSWORD:
@@ -344,12 +356,206 @@ void clear_log()
     }
     
 }
-void menu_scrolling()
+
+
+void set_time()
 {
-    //Sw3->up_scrolling
-    //sw4->down_scrolling
-    
-    
+    unsigned char previous_time[3];
+    unsigned char key;
+    unsigned char field = SECOND_FIELD;
+    get_time(previous_time);
+    clear_display();
+    clcd_print("Set time",LINE1(0));
+
+    unsigned char hour,minute,second;
+
+    hour = ((previous_time[0]>>4) *10) + (previous_time[0] & 0x0F);
+    minute = ((previous_time[1]>>4) *10) + (previous_time[1] & 0x0F);
+    second = ((previous_time[2]>>4) *10) + (previous_time[2] & 0x0F);
+    unsigned char change = 1;
+
+    unsigned char time[9];
+    unsigned int delay = BLINK_DELAY;
+    unsigned char blink = 0;
+    while(1)
+    {
+        
+        key = read_digital_keypad(STATE);
+        
+
+        if(key == SW3)
+        {
+            //decrement
+            if(field == SECOND_FIELD)
+            {
+                if(second == 0)
+                {
+                    second = 59;
+                }
+                else
+                    --second;
+            }
+            else if(field == MINUTE_FIELD)
+            {
+                if(minute == 0)
+                {
+                    minute = 59;
+                }
+                else
+                    --minute;
+            }
+            else if(field == HOUR_FIELD)
+            {
+                if(hour == 0)
+                {
+                    hour = 23;
+                }
+                else
+                    --hour;
+
+            }
+            change = 1;
+        }
+        else if(key == SW4)
+        {
+            //increment
+            if(field == SECOND_FIELD)
+            {
+                if(second == 59)
+                {
+                    second = 0;
+                }
+                else
+                    ++second;
+            }
+            else if(field == MINUTE_FIELD)
+            {
+                if(minute == 59)
+                {
+                    minute = 0;
+                }
+                else
+                    ++minute;
+            }
+            else if(field == HOUR_FIELD)
+            {
+                if(hour == 23)
+                {
+                    hour = 0;
+                }
+                else
+                    ++hour;
+            }
+            change =1;
+        }
+        else if(key == SW2)
+        {
+            //change field
+            if(field >= HOUR_FIELD)
+            {
+                field = SECOND_FIELD;
+            }
+            else
+                ++field;
+            change = 1;
+        }
+        else if(key == SW0)
+        {
+            return;
+        }
+        else if(key == SW5)
+        {
+            clear_display();
+            clcd_print("Press RB5-Confirm",LINE1(0));
+            clcd_print("      RB0-Go back",LINE2(0));
+            do
+            {
+                key = read_digital_keypad(STATE);
+            }while(key != SW5 && key != SW0);
+            if(key == SW5)
+            {
+                //set the value in time to RTC
+                unsigned bcd_sec,bcd_min,bcd_hour;
+                bcd_sec = ((second/10)<<4) | (second%10);
+                write_ds1307(bcd_sec,SEC_ADDR);
+                bcd_min = ((minute/10)<<4) | (minute%10);
+                write_ds1307(bcd_min,MIN_ADDR);
+                bcd_hour = ((hour/10)<<4) | (hour%10);
+                write_ds1307(bcd_hour,HOUR_ADDR);
+                time_changed_flag = 1;
+                return;
+            }
+            else 
+            {
+                time_changed_flag =0;
+                return;
+            }
+        }
+        //----- if user changes time
+        if(change )
+        {
+            blink = 0; //resetting blink, 0= lightup, 1= turn off
+            time[0] = (hour / 10) + '0';
+            time[1] = (hour % 10) + '0';
+            time[2] = ':';
+
+            time[3] = (minute / 10) + '0';
+            time[4] = (minute % 10) + '0';
+            time[5] = ':';
+
+            time[6] = (second / 10) + '0';
+            time[7] = (second % 10) + '0';
+
+            time[8] = '\0';
+            change = 0;
+            clcd_print(time,LINE2(0));
+        }
+        //-----TIMER
+        if(one_second_flag)
+        {
+            one_second_flag = 0;
+            blink = !blink;
+        }
+        //-----BLINKING algo
+        if(blink)
+        {
+            if(field == SECOND_FIELD)
+            {
+                clcd_putch(' ',LINE2(6));
+                clcd_putch(' ',LINE2(7));
+            }
+            else if(field == MINUTE_FIELD)
+            {
+                clcd_putch(' ',LINE2(3));
+                clcd_putch(' ',LINE2(4));
+            }
+            else if(field == HOUR_FIELD)
+            {
+                clcd_putch(' ',LINE2(0));
+                clcd_putch(' ',LINE2(1));
+            }
+        }
+        if(!blink)
+        {
+            if(field == SECOND_FIELD)
+            {
+                clcd_putch(time[6],LINE2(6));
+                clcd_putch(time[7],LINE2(7));
+            }
+            else if(field == MINUTE_FIELD)
+            {
+                clcd_putch(time[3],LINE2(3));
+                clcd_putch(time[4],LINE2(4));
+            }
+            else if(field == HOUR_FIELD)
+            {
+                clcd_putch(time[0],LINE2(0));
+                clcd_putch(time[1],LINE2(1));
+            }
+
+        }
+        
+    }
 }
 
 void change_password()

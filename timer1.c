@@ -25,8 +25,8 @@ void __interrupt() isr(void)
     if(TMR1IF)
     {
         timer1_count++;
-        TMR1H = 0x0B;
-        TMR1L = 0xDC;
+        TMR1H = 0x1C;
+        TMR1L = 0xDC; //0BDC
 
         TMR1IF = 0;
         if(timer1_count >= 10)
