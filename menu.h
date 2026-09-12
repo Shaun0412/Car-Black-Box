@@ -56,7 +56,9 @@ void read_log(event_t *events,unsigned char event_index);
 
 void print_log_event(event_t *event,int line);
 void set_time();
+void change_password();
 unsigned char validate_password();
 void clear_log();
+void download_log();
 #endif	/* MENU_H */
 

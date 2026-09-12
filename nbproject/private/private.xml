@@ -5,10 +5,12 @@
         <group>
             <file>file:/Users/shaunvarghese/MPLABXProjects/Car_black_box_Shaun_25050f041f.X/main.c</file>
             <file>file:/Users/shaunvarghese/MPLABXProjects/Car_black_box_Shaun_25050f041f.X/menu.h</file>
-            <file>file:/Users/shaunvarghese/MPLABXProjects/Car_black_box_Shaun_25050f041f.X/keypad.h</file>
             <file>file:/Users/shaunvarghese/MPLABXProjects/Car_black_box_Shaun_25050f041f.X/ext_eeprom.h</file>
+            <file>file:/Users/shaunvarghese/MPLABXProjects/Car_black_box_Shaun_25050f041f.X/clcd.h</file>
             <file>file:/Users/shaunvarghese/MPLABXProjects/Car_black_box_Shaun_25050f041f.X/timer1.h</file>
+            <file>file:/Users/shaunvarghese/MPLABXProjects/Car_black_box_Shaun_25050f041f.X/dashboard.h</file>
             <file>file:/Users/shaunvarghese/MPLABXProjects/Car_black_box_Shaun_25050f041f.X/timer1.c</file>
+            <file>file:/Users/shaunvarghese/MPLABXProjects/Car_black_box_Shaun_25050f041f.X/dashboard.c</file>
             <file>file:/Users/shaunvarghese/MPLABXProjects/Car_black_box_Shaun_25050f041f.X/main.h</file>
             <file>file:/Users/shaunvarghese/MPLABXProjects/Car_black_box_Shaun_25050f041f.X/ext_eeprom.c</file>
             <file>file:/Users/shaunvarghese/MPLABXProjects/Car_black_box_Shaun_25050f041f.X/menu.c</file>

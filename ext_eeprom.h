@@ -10,7 +10,7 @@
 
 #define EXT_EEPROM_SLAVE_WRITE 0XA0
 #define EXT_EEPROM_SLAVE_READ 0xA1
-
+#define _XTAL_FREQ 20000000
 
 void write_external_eeprom(unsigned char data, unsigned int addr);
 unsigned char read_external_eeprom(unsigned int addr);

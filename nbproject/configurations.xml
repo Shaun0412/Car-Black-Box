@@ -14,6 +14,7 @@
       <itemPath>timer1.h</itemPath>
       <itemPath>menu.h</itemPath>
       <itemPath>dashboard.h</itemPath>
+      <itemPath>uart.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -33,6 +34,7 @@
       <itemPath>menu.c</itemPath>
       <itemPath>timer1.c</itemPath>
       <itemPath>dashboard.c</itemPath>
+      <itemPath>uart.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

@@ -16,7 +16,7 @@
 
 
 void clear_display();
-int timer1_delay(int seconds);
+void timer1_delay(int seconds);
 
 void dashboard_screen_setup();
 #endif	/* MAIN_H */

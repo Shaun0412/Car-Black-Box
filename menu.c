@@ -1,4 +1,4 @@
-//#include <xc.h>
+#include <xc.h>
 #include "keypad.h"
 #include "clcd.h"
 #include "adc.h"
@@ -8,12 +8,15 @@
 #include "menu.h"
 #include "main.h"
 
+#include "uart.h"
 #define PASSWORD_ENTERING_DELAY 5
 
+
+#define MESSAGE_DELAY 5
 extern volatile unsigned char one_second_flag;
 
 extern unsigned char event_count;
-
+extern char display_clear[];
 unsigned char time_changed_flag = 0;
 
 //RB4->0,RB5->1
@@ -202,6 +205,7 @@ void menu_selection(unsigned char selection_option)
         }
         case DOWNLOAD_LOG:
         {
+            download_log();
             break;
         }
         case SET_TIME:
@@ -211,6 +215,7 @@ void menu_selection(unsigned char selection_option)
         }
         case CHANGE_PASSWORD:
         {
+            change_password();
             break;
         }
     }
@@ -320,16 +325,16 @@ void read_log(event_t *events,unsigned char event_index)
     events->hour[2] = '\0';
     events->minute[0] = read_external_eeprom(address_counter++); 
     events->minute[1] = read_external_eeprom(address_counter++); 
-    events->minute[2] = '\0'; 
+    events->minute[2] = '\0';
     events->second[0] = read_external_eeprom(address_counter++); 
     events->second[1] = read_external_eeprom(address_counter++); 
-    events->second[2] = '\0'; 
+    events->second[2] = '\0';
     events->gear[0] = read_external_eeprom(address_counter++); 
     events->gear[1] = read_external_eeprom(address_counter++); 
-    events->gear[2] = '\0'; 
+    events->gear[2] = '\0';
     events->speed[0] = read_external_eeprom(address_counter++); 
     events->speed[1] = read_external_eeprom(address_counter++); 
-    events->speed[2] = '\0'; 
+     events->speed[2] = '\0';
     return;
 
 }
@@ -357,7 +362,87 @@ void clear_log()
     
 }
 
+void download_log()
+{
+    event_t event;
+    if(event_count == 0)
+    {
+        clcd_print("No Logs...       ",LINE1(0));
+        clcd_print(display_clear,LINE2(0));
+        timer1_delay(MESSAGE_DELAY);
+        clear_display();
+        return;
+    }
+    
+    clcd_print("Downloading...  ",LINE1(0));
+    clcd_print(display_clear,LINE2(0));
+    TXEN = 1; // enables uart tx
+    //header
+    puts("---------------------");
+    putchar('\r');
+    putchar('\n');
+    puts("Events Logs");
+    putchar('\r');
+    putchar('\n');
+    puts("---------------------");
+    putchar('\r');
+    putchar('\n');
+    for(int i = 0; i < event_count; i++)
+    {
+        read_log(&event, i);
 
+        putchar(event.hour[0]);
+        putchar(event.hour[1]);
+        putchar(':');
+        putchar(event.minute[0]);
+        putchar(event.minute[1]);
+        putchar(':');
+        putchar(event.second[0]);
+        putchar(event.second[1]);
+
+        puts("  ");
+
+        putchar(event.gear[0]);
+        putchar(event.gear[1]);
+
+        puts("  ");
+
+        putchar(event.speed[0]);
+        putchar(event.speed[1]);
+        puts(" km/h");
+
+        puts("\r\n");
+    }
+
+    //footer
+    puts("---------------------");
+    putchar('\r');
+    putchar('\n');
+    puts("End of Logs");
+    putchar('\r');
+    putchar('\n');
+    puts("---------------------");
+    putchar('\r');
+    putchar('\n');
+
+    TXEN = 0; //disable transmitter
+    clcd_print("Data Downloaded   ",LINE1(0));
+    clcd_print("RB0 -> EXIT       ",LINE2(0));
+    timer1_delay(MESSAGE_DELAY);
+
+    unsigned char key;
+    do
+    {
+        key = read_digital_keypad(STATE);
+    } while(key != SW0);
+
+    return;
+        
+    
+    
+
+    
+}
 void set_time()
 {
     unsigned char previous_time[3];
@@ -466,22 +551,25 @@ void set_time()
         else if(key == SW5)
         {
             clear_display();
-            clcd_print("Press RB5-Confirm",LINE1(0));
-            clcd_print("      RB0-Go back",LINE2(0));
+            clcd_print("RB5-Confirm     ",LINE1(0));
+            clcd_print("RB0-Go back     ",LINE2(0));
             do
             {
                 key = read_digital_keypad(STATE);
             }while(key != SW5 && key != SW0);
             if(key == SW5)
             {
+                
+                write_ds1307(0x80,SEC_ADDR); //disable RTC
                 //set the value in time to RTC
                 unsigned bcd_sec,bcd_min,bcd_hour;
                 bcd_sec = ((second/10)<<4) | (second%10);
-                write_ds1307(bcd_sec,SEC_ADDR);
+                write_ds1307(0x80,SEC_ADDR);//disable RTC CH bit and copying new seconds
                 bcd_min = ((minute/10)<<4) | (minute%10);
                 write_ds1307(bcd_min,MIN_ADDR);
-                bcd_hour = ((hour/10)<<4) | (hour%10);
+                bcd_hour = (((hour/10)<<4) | (hour%10));
                 write_ds1307(bcd_hour,HOUR_ADDR);
+                write_ds1307(bcd_sec & ~(0x80),SEC_ADDR);//enabling RTC ch = 0, and copying seconds value
                 time_changed_flag = 1;
                 return;
             }
@@ -561,19 +649,94 @@ void set_time()
 void change_password()
 {
     unsigned char key;
-    for(int i=0;i<4;i++)
+    unsigned char new_password[4];
+    unsigned char reenter[4];
+
+    /* Enter new password */
+    clcd_print("Enter Password  ", LINE1(0));
+    clcd_print(display_clear, LINE2(0));
+
+    for(int i = 0; i < 4; i++)
     {
-        
         do
         {
             key = read_digital_keypad(STATE);
-            if(key == SW4)
-                original_password[i] = '0';
-            else if(key == SW5)
-                original_password[i] = '1';
+
+            if(key == SW4)          // RB4 -> 0
+            {
+                clcd_putch('0', LINE2(i));
+                new_password[i] = '0';
+            }
+            else if(key == SW5)     // RB5 -> 1
+            {
+                clcd_putch('1', LINE2(i));
+                new_password[i] = '1';
+            }
             else if(key != ALL_RELEASED)
+            {
                 --i;
-        }while(key == ALL_RELEASED);
+            }
+
+        } while(key == ALL_RELEASED);
     }
-    
+
+
+    /* Re-enter new password */
+    clcd_print("ReEnter Password", LINE1(0));
+    clcd_print("                ", LINE2(0));
+
+    for(int i = 0; i < 4; i++)
+    {
+        do
+        {
+            key = read_digital_keypad(STATE);
+
+            if(key == SW4)          // RB4 -> 0
+            {
+                clcd_putch('0', LINE2(i));
+                reenter[i] = '0';
+            }
+            else if(key == SW5)     // RB5 -> 1
+            {
+                clcd_putch('1', LINE2(i));
+                reenter[i] = '1';
+            }
+            else if(key != ALL_RELEASED)
+            {
+                --i;
+            }
+
+        } while(key == ALL_RELEASED);
+    }
+
+
+    /* Compare passwords */
+    for(int i = 0; i < 4; i++)
+    {
+        if(new_password[i] != reenter[i])
+        {
+            clcd_print("Not Matching    ", LINE1(0));
+            clcd_print("                ", LINE2(0));
+
+            timer1_delay(MESSAGE_DELAY);
+            clear_display();
+
+            return;
+        }
+    }
+
+
+    /* Passwords match,update original password */
+    for(int i = 0; i < 4; i++)
+    {
+        original_password[i] = new_password[i];
+    }
+
+    original_password[4] = '\0';
+
+    clcd_print("Password Changed", LINE1(0));
+    clcd_print("                ", LINE2(0));
+
+    timer1_delay(MESSAGE_DELAY);
+    clear_display();
 }

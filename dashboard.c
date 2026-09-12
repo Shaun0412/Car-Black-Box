@@ -59,7 +59,7 @@ void store_eeprom()
             for(j = 0; j < 10; j++)
             {
                 data = read_external_eeprom(source_address + j);
-                write_external_eeprom(destination_address + j, data);
+                write_external_eeprom(data,destination_address + j);
             }
         }
 

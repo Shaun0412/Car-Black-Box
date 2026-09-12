@@ -16,7 +16,7 @@
 #include "i2c.h"
 #include "ext_eeprom.h"
 #include "dashboard.h"
-
+#include "uart.h"
 #include "main.h"
 #include "menu.h"
 volatile unsigned char timer1_count = 0;
@@ -44,6 +44,7 @@ void init_config(void)
     init_clcd();
     adc_init();
     init_timer1();
+    init_uart(9600);
     clcd_print("TIME      EV  SP",LINE1(0));
     
 
@@ -146,7 +147,7 @@ void clear_display()
 }
 
 
-int timer1_delay(int seconds)
+void timer1_delay(int seconds)
 {
     while(1)
     {

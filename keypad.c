@@ -22,7 +22,7 @@ unsigned char read_digital_keypad(unsigned char mode)
         /* Detect new press */
         if (key != ALL_RELEASED && key_state == ALL_RELEASED)
         {
-            __delay_ms(20);
+            __delay_ms(10);
 
             key = PORTB & 0x3F;
 
@@ -36,7 +36,7 @@ unsigned char read_digital_keypad(unsigned char mode)
         /* Detect release */
         if (key == ALL_RELEASED)
         {
-            __delay_ms(20);
+            __delay_ms(10);
 
             if ((PORTB & 0x3F) == ALL_RELEASED)
             {

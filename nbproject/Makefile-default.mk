@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=main.c ds1307.c i2c.c clcd.c time.c keypad.c adc.c ext_eeprom.c menu.c timer1.c dashboard.c
+SOURCEFILES_QUOTED_IF_SPACED=main.c ds1307.c i2c.c clcd.c time.c keypad.c adc.c ext_eeprom.c menu.c timer1.c dashboard.c uart.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.p1 ${OBJECTDIR}/ds1307.p1 ${OBJECTDIR}/i2c.p1 ${OBJECTDIR}/clcd.p1 ${OBJECTDIR}/time.p1 ${OBJECTDIR}/keypad.p1 ${OBJECTDIR}/adc.p1 ${OBJECTDIR}/ext_eeprom.p1 ${OBJECTDIR}/menu.p1 ${OBJECTDIR}/timer1.p1 ${OBJECTDIR}/dashboard.p1
-POSSIBLE_DEPFILES=${OBJECTDIR}/main.p1.d ${OBJECTDIR}/ds1307.p1.d ${OBJECTDIR}/i2c.p1.d ${OBJECTDIR}/clcd.p1.d ${OBJECTDIR}/time.p1.d ${OBJECTDIR}/keypad.p1.d ${OBJECTDIR}/adc.p1.d ${OBJECTDIR}/ext_eeprom.p1.d ${OBJECTDIR}/menu.p1.d ${OBJECTDIR}/timer1.p1.d ${OBJECTDIR}/dashboard.p1.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.p1 ${OBJECTDIR}/ds1307.p1 ${OBJECTDIR}/i2c.p1 ${OBJECTDIR}/clcd.p1 ${OBJECTDIR}/time.p1 ${OBJECTDIR}/keypad.p1 ${OBJECTDIR}/adc.p1 ${OBJECTDIR}/ext_eeprom.p1 ${OBJECTDIR}/menu.p1 ${OBJECTDIR}/timer1.p1 ${OBJECTDIR}/dashboard.p1 ${OBJECTDIR}/uart.p1
+POSSIBLE_DEPFILES=${OBJECTDIR}/main.p1.d ${OBJECTDIR}/ds1307.p1.d ${OBJECTDIR}/i2c.p1.d ${OBJECTDIR}/clcd.p1.d ${OBJECTDIR}/time.p1.d ${OBJECTDIR}/keypad.p1.d ${OBJECTDIR}/adc.p1.d ${OBJECTDIR}/ext_eeprom.p1.d ${OBJECTDIR}/menu.p1.d ${OBJECTDIR}/timer1.p1.d ${OBJECTDIR}/dashboard.p1.d ${OBJECTDIR}/uart.p1.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/main.p1 ${OBJECTDIR}/ds1307.p1 ${OBJECTDIR}/i2c.p1 ${OBJECTDIR}/clcd.p1 ${OBJECTDIR}/time.p1 ${OBJECTDIR}/keypad.p1 ${OBJECTDIR}/adc.p1 ${OBJECTDIR}/ext_eeprom.p1 ${OBJECTDIR}/menu.p1 ${OBJECTDIR}/timer1.p1 ${OBJECTDIR}/dashboard.p1
+OBJECTFILES=${OBJECTDIR}/main.p1 ${OBJECTDIR}/ds1307.p1 ${OBJECTDIR}/i2c.p1 ${OBJECTDIR}/clcd.p1 ${OBJECTDIR}/time.p1 ${OBJECTDIR}/keypad.p1 ${OBJECTDIR}/adc.p1 ${OBJECTDIR}/ext_eeprom.p1 ${OBJECTDIR}/menu.p1 ${OBJECTDIR}/timer1.p1 ${OBJECTDIR}/dashboard.p1 ${OBJECTDIR}/uart.p1
 
 # Source Files
-SOURCEFILES=main.c ds1307.c i2c.c clcd.c time.c keypad.c adc.c ext_eeprom.c menu.c timer1.c dashboard.c
+SOURCEFILES=main.c ds1307.c i2c.c clcd.c time.c keypad.c adc.c ext_eeprom.c menu.c timer1.c dashboard.c uart.c
 
 
 
@@ -182,6 +182,14 @@ ${OBJECTDIR}/dashboard.p1: dashboard.c  nbproject/Makefile-${CND_CONF}.mk
 	@-${MV} ${OBJECTDIR}/dashboard.d ${OBJECTDIR}/dashboard.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/dashboard.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
+${OBJECTDIR}/uart.p1: uart.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/uart.p1.d 
+	@${RM} ${OBJECTDIR}/uart.p1 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1   -mdfp="${DFP_DIR}/xc8"  -fno-short-double -fno-short-float -O0 -fasmfile -maddrqual=ignore -xassembler-with-cpp -mwarn=-3 -Wa,-a -DXPRJ_default=$(CND_CONF)  -msummary=-psect,-class,+mem,-hex,-file  -ginhx032 -Wl,--data-init -mno-keep-startup -mno-osccal -mno-resetbits -mno-save-resetbits -mno-download -mno-stackcall $(COMPARISON_BUILD)  -std=c99 -gdwarf-3 -mstack=compiled:auto:auto     -o ${OBJECTDIR}/uart.p1 uart.c 
+	@-${MV} ${OBJECTDIR}/uart.d ${OBJECTDIR}/uart.p1.d 
+	@${FIXDEPS} ${OBJECTDIR}/uart.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
+	
 else
 ${OBJECTDIR}/main.p1: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
@@ -270,6 +278,14 @@ ${OBJECTDIR}/dashboard.p1: dashboard.c  nbproject/Makefile-${CND_CONF}.mk
 	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c   -mdfp="${DFP_DIR}/xc8"  -fno-short-double -fno-short-float -O0 -fasmfile -maddrqual=ignore -xassembler-with-cpp -mwarn=-3 -Wa,-a -DXPRJ_default=$(CND_CONF)  -msummary=-psect,-class,+mem,-hex,-file  -ginhx032 -Wl,--data-init -mno-keep-startup -mno-osccal -mno-resetbits -mno-save-resetbits -mno-download -mno-stackcall $(COMPARISON_BUILD)  -std=c99 -gdwarf-3 -mstack=compiled:auto:auto     -o ${OBJECTDIR}/dashboard.p1 dashboard.c 
 	@-${MV} ${OBJECTDIR}/dashboard.d ${OBJECTDIR}/dashboard.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/dashboard.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
+	
+${OBJECTDIR}/uart.p1: uart.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/uart.p1.d 
+	@${RM} ${OBJECTDIR}/uart.p1 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c   -mdfp="${DFP_DIR}/xc8"  -fno-short-double -fno-short-float -O0 -fasmfile -maddrqual=ignore -xassembler-with-cpp -mwarn=-3 -Wa,-a -DXPRJ_default=$(CND_CONF)  -msummary=-psect,-class,+mem,-hex,-file  -ginhx032 -Wl,--data-init -mno-keep-startup -mno-osccal -mno-resetbits -mno-save-resetbits -mno-download -mno-stackcall $(COMPARISON_BUILD)  -std=c99 -gdwarf-3 -mstack=compiled:auto:auto     -o ${OBJECTDIR}/uart.p1 uart.c 
+	@-${MV} ${OBJECTDIR}/uart.d ${OBJECTDIR}/uart.p1.d 
+	@${FIXDEPS} ${OBJECTDIR}/uart.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
 endif
 
